@@ -3,7 +3,7 @@
     <!-- Banner -->
     <div class="banner">
       <div class="banner-inner">
-        <h1>欢迎来到我的博客</h1>
+        <h1>欢迎来到我的博客1111111</h1>
         <p>分享技术、记录生活、保持热爱</p>
       </div>
     </div>
