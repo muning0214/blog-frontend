@@ -1,29 +1,26 @@
 {
-  "name": "tech-blog",
-  "private": true,
+  "name": "blog-frontend",
   "version": "1.0.0",
+  "private": true,
   "type": "module",
-  "description": "A personal tech blog with Markdown authoring, backed by WorkBuddy Cloud Service",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "start": "vite build && vite preview",
-    "preview": "vite preview",
-    "typecheck": "tsc --noEmit"
+    "preview": "vite preview"
   },
   "dependencies": {
+    "@ant-design/icons-vue": "^7.0.1",
+    "ant-design-vue": "^4.2.3",
+    "axios": "^1.7.2",
+    "dayjs": "^1.11.11",
     "dompurify": "^3.2.4",
     "highlight.js": "^11.11.1",
-    "marked": "^15.0.7",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "react-router-dom": "^7.1.5"
+    "marked": "^12.0.2",
+    "vue": "^3.4.27",
+    "vue-router": "^4.3.2"
   },
   "devDependencies": {
-    "@types/react": "^19.0.8",
-    "@types/react-dom": "^19.0.3",
-    "@vitejs/plugin-react": "^4.3.4",
-    "typescript": "^5.7.3",
-    "vite": "^6.0.11"
+    "@vitejs/plugin-vue": "^5.0.4",
+    "vite": "^5.2.11"
   }
 }
