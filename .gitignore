@@ -1,7 +1,16 @@
 # Frontend
 node_modules/
 dist/
+dist-ssr/
+
+# ---- 环境变量：真实接口地址不进仓库 ----
+# *.local 已经覆盖 .env.local / .env.development.local
 *.local
+.env
+.env.production
+.env.development
+# 但模板文件要保留，方便别人知道有哪些变量
+!.env.example
 
 # Editor
 .vscode/
@@ -13,6 +22,7 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+*.log
 
 # OS
 .DS_Store
