@@ -23,6 +23,15 @@ const routes = [
 
   { path: '/login', name: 'Login', component: () => import('@/views/Login.vue') },
 
+  {
+    // GitHub 授权回调。必须是独立路由（不套 BlogLayout）：
+    // 它是中转页，落地后立刻跳走，不该出现页头页脚。
+    // 这个地址要与 GitHub OAuth App 里登记的 Authorization callback URL 完全一致。
+    path: '/auth/github/callback',
+    name: 'GithubCallback',
+    component: () => import('@/views/GithubCallback.vue'),
+  },
+
   // ===== 作者后台 =====
   {
     path: '/admin',

@@ -230,7 +230,10 @@ const save = async (status) => {
       slug: form.slug.trim() || undefined,
       summary: form.summary.trim() || undefined,
       content: form.content,
-      coverPath: form.cover_path || undefined,
+      // 字段名必须是 snake_case：后端开了 Jackson 的 SNAKE_CASE 策略，
+      // 反序列化也按 snake_case 匹配，写成 coverPath 会被静默丢弃 ——
+      // 表现是「封面上传成功了，保存后却没了」。
+      cover_path: form.cover_path || undefined,
       tags: form.tags,
       attachments: form.attachments,
       status: status || form.status,

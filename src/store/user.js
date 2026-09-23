@@ -1,5 +1,11 @@
 import { computed, reactive } from 'vue'
-import { fetchMe, logout as logoutApi, signIn, signUp } from '@/api/auth'
+import {
+  fetchMe,
+  logout as logoutApi,
+  signIn,
+  signInWithGithub,
+  signUp,
+} from '@/api/auth'
 import { getToken, setToken } from '@/api/request'
 
 /**
@@ -67,6 +73,26 @@ export function useUserStore() {
       state.ready = true
       inflight = Promise.resolve()
       return data
+    },
+
+    /** GitHub 回调成功后的落地，与密码登录走同一套状态更新 */
+    async loginWithGithub(code, oauthState) {
+      const data = await signInWithGithub(code, oauthState)
+      state.user = data.user
+      state.unavailable = false
+      state.ready = true
+      inflight = Promise.resolve()
+      return data
+    },
+
+    /** 绑定 GitHub 后刷新当前用户（绑定本身不改用户，但保持一致的收口） */
+    async refreshUser() {
+      try {
+        state.user = await fetchMe()
+      } catch {
+        /* 拦截器已处理 401 */
+      }
+      return state.user
     },
 
     /** 清本地登录态。令牌失效时由 request 层回调触发。 */

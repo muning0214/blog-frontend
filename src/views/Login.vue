@@ -1,10 +1,12 @@
 <script setup>
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { message } from 'ant-design-vue'
+import { fetchGithubAuthorizeUrl, fetchGithubEnabled } from '@/api/auth'
 import { useUserStore } from '@/store/user'
 import { useSiteSettings } from '@/composables/useSiteSettings'
 import { useDocumentTitle } from '@/composables/useDocumentTitle'
+import { rememberOAuthIntent } from '@/utils/oauthPending'
 
 const route = useRoute()
 const router = useRouter()
@@ -19,13 +21,35 @@ const busy = ref(false)
 const error = ref('')
 const ok = ref('')
 
+/** 后端没配置 GitHub 登录时不渲染那个按钮：藏起来比点了报错好 */
+const githubEnabled = ref(false)
+const githubBusy = ref(false)
+
 const redirectTo = computed(() => String(route.query.redirect || '/admin/dashboard'))
 
-onMounted(() => {
+onMounted(async () => {
+  githubEnabled.value = Boolean(await fetchGithubEnabled())
   if (store.state.unavailable) {
-    error.value = '连不上后端服务：请先在 blog-backend 目录执行 mvn spring-boot:run（默认 8080 端口），然后刷新本页。'
+    error.value =
+      '连不上后端服务：请先在 blog-backend 目录执行 mvn spring-boot:run（默认 8080 端口），然后刷新本页。'
   }
 })
+
+/** 跳去 GitHub 授权。整页跳转，回来时落在 /auth/github/callback */
+const startGithub = async () => {
+  githubBusy.value = true
+  error.value = ''
+  try {
+    const { authorizeUrl, state } = await fetchGithubAuthorizeUrl()
+    // 记下这次跳转是「登录」以及登录后要去哪 —— GitHub OAuth App 只允许一个回调地址，
+    // 登录与绑定会落到同一个页面，页面靠这份记录分辨
+    rememberOAuthIntent(state, 'login', redirectTo.value)
+    window.location.href = authorizeUrl
+  } catch (e) {
+    error.value = e?.message || '无法发起 GitHub 登录'
+    githubBusy.value = false
+  }
+}
 
 const switchTab = (next) => {
   tab.value = next
@@ -159,6 +183,23 @@ const submit = async () => {
         </a-button>
       </a-form>
 
+      <template v-if="githubEnabled">
+        <div class="login-divider"><span>或</span></div>
+        <button
+          class="github-btn"
+          type="button"
+          :disabled="githubBusy"
+          @click="startGithub"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path
+              d="M12 .5C5.37.5 0 5.78 0 12.29c0 5.21 3.44 9.63 8.21 11.19.6.11.82-.25.82-.56v-2.17c-3.34.71-4.04-1.58-4.04-1.58-.55-1.36-1.34-1.72-1.34-1.72-1.09-.73.08-.72.08-.72 1.2.08 1.84 1.22 1.84 1.22 1.07 1.8 2.81 1.28 3.5.98.11-.77.42-1.28.76-1.58-2.67-.3-5.47-1.31-5.47-5.84 0-1.29.47-2.34 1.23-3.17-.12-.3-.53-1.5.12-3.12 0 0 1.01-.32 3.3 1.21a11.6 11.6 0 0 1 6.01 0c2.29-1.53 3.3-1.21 3.3-1.21.65 1.62.24 2.82.12 3.12.77.83 1.23 1.88 1.23 3.17 0 4.54-2.81 5.53-5.49 5.82.43.37.81 1.1.81 2.22v3.29c0 .31.21.68.83.56A12.02 12.02 0 0 0 24 12.29C24 5.78 18.63.5 12 .5z"
+            />
+          </svg>
+          {{ githubBusy ? '正在跳转…' : '使用 GitHub 登录' }}
+        </button>
+      </template>
+
       <div class="login-card__foot">
         <span class="login-card__note">
           登录态存在浏览器本地，令牌过期会自动跳回本页
@@ -185,3 +226,45 @@ const submit = async () => {
     </aside>
   </div>
 </template>
+
+<style scoped>
+.login-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 22px 0 16px;
+  color: var(--text-mute, #8b93a3);
+  font-size: 13px;
+}
+.login-divider::before,
+.login-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border, #e7e9ef);
+}
+
+.github-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  width: 100%;
+  height: 40px;
+  border: 1px solid var(--border, #e7e9ef);
+  border-radius: 8px;
+  background: var(--surface, #fff);
+  color: var(--text, #12141a);
+  font-size: 14px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+.github-btn:hover:not(:disabled) {
+  border-color: var(--accent, #5145e5);
+  color: var(--accent, #5145e5);
+}
+.github-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+</style>
