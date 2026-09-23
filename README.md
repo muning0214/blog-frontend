@@ -55,7 +55,7 @@ cd blog-backend && mvn spring-boot:run
 
 ```bash
 npm install
-npm run dev        # http://localhost:5173
+npm run dev        # http://localhost:5174
 ```
 
 开发期 Vite 把 `/api` 与 `/uploads` 都代理到 `http://localhost:8080`，
