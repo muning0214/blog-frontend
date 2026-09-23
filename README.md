@@ -3,7 +3,7 @@
 DevLog 个人博客的**前端**：Vue 3.4 + Vite 5 + Ant Design Vue 4。
 只管界面与交互——不碰数据库，所有数据都来自后端接口。
 
-后端在 [blog-backend](https://github.com/muning0214/blog-backend)。
+后端在 [devlog-server](https://github.com/muning0214/devlog-server)。
 
 ## 技术栈
 
@@ -151,7 +151,7 @@ antd 只用在「表单、反馈、浮层」这类交互密集件上：`Form` / 
 
 **GitHub 登录按钮不显示**
 后端没配置 GitHub 登录——接口返回 `enabled: false`，前端据此把入口藏起来。
-这是刻意的降级，比让用户点下去再弹「未配置」好。配置方法见 [后端 README](https://github.com/muning0214/blog-backend)。
+这是刻意的降级，比让用户点下去再弹「未配置」好。配置方法见 [后端 README](https://github.com/muning0214/devlog-server)。
 
 **登录后过一段时间操作全部报错**
 令牌默认 24 小时过期。过期后拦截器会清掉本地令牌并跳回登录页，
